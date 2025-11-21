@@ -73,3 +73,43 @@ const tokensSlice = createSlice({
 
 export const { setTokens, updateTokenPrice, addToken, updateTokenStatus, setSortConfig } = tokensSlice.actions;
 export default tokensSlice.reducer;
+
+// Selectors
+import { RootState } from '@/lib/store/store';
+import { createSelector } from '@reduxjs/toolkit';
+
+const selectTokens = (state: RootState) => state.tokens.tokens;
+const selectLists = (state: RootState) => state.tokens.lists;
+const selectSortConfig = (state: RootState) => state.tokens.sortConfig;
+
+export const selectSortedTokenIds = createSelector(
+  [selectTokens, selectLists, selectSortConfig],
+  (tokens, lists, sortConfig) => {
+    const sortedLists: Record<ColumnType, string[]> = {
+      new_pairs: [],
+      final_stretch: [],
+      migrated: [],
+    };
+
+    (Object.keys(lists) as ColumnType[]).forEach((key) => {
+      const list = lists[key];
+      const sorted = [...list].sort((a, b) => {
+        const tokenA = tokens[a];
+        const tokenB = tokens[b];
+
+        if (!tokenA || !tokenB) return 0;
+
+        const valA = tokenA[sortConfig.key];
+        const valB = tokenB[sortConfig.key];
+
+        if (typeof valA === 'number' && typeof valB === 'number') {
+          return sortConfig.direction === 'asc' ? valA - valB : valB - valA;
+        }
+        return 0;
+      });
+      sortedLists[key] = sorted;
+    });
+
+    return sortedLists;
+  }
+);

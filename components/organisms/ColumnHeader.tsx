@@ -3,12 +3,33 @@
 import React from 'react';
 import { Zap, Settings } from 'lucide-react';
 
+import { useAppDispatch, useAppSelector } from '@/lib/store/hooks';
+import { setSortConfig } from '@/features/tokens/store/tokensSlice';
+import { SortConfig } from '@/types/token';
+import { Popover } from '../atoms/Popover';
+
 interface ColumnHeaderProps {
   title: string;
   count: number;
 }
 
 export const ColumnHeader = React.memo<ColumnHeaderProps>(({ title, count }) => {
+  const dispatch = useAppDispatch();
+  const sortConfig = useAppSelector((state) => state.tokens.sortConfig);
+
+  const handleSort = (key: SortConfig['key']) => {
+    const direction = sortConfig.key === key && sortConfig.direction === 'desc' ? 'asc' : 'desc';
+    dispatch(setSortConfig({ key, direction }));
+  };
+
+  const sortOptions: { label: string; key: SortConfig['key'] }[] = [
+    { label: 'Time', key: 'created' },
+    { label: 'Market Cap', key: 'mcap' },
+    { label: 'Volume', key: 'volume' },
+    { label: 'Holders', key: 'holders' },
+    { label: 'Transactions', key: 'transactions' },
+  ];
+
   return (
     <div className="flex items-center justify-between px-5 py-4 bg-[#0a0a0a] border-b border-white/5 sticky top-0 z-10">
       <div className="flex flex-col gap-1.5">
@@ -25,17 +46,40 @@ export const ColumnHeader = React.memo<ColumnHeaderProps>(({ title, count }) => 
           {['P1', 'P2', 'P3'].map((p, i) => (
             <button
               key={p}
-              className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors ${
-                i === 0 ? 'bg-blue-600/20 text-blue-400' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
-              }`}
+              className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors ${i === 0 ? 'bg-blue-600/20 text-blue-400' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+                }`}
             >
               {p}
             </button>
           ))}
         </div>
-        <Settings
-          size={16}
-          className="text-gray-500 cursor-pointer hover:text-gray-300 transition-colors"
+
+        <Popover
+          position="bottom"
+          trigger={
+            <Settings
+              size={16}
+              className="text-gray-500 cursor-pointer hover:text-gray-300 transition-colors"
+            />
+          }
+          content={
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-bold text-gray-500 mb-2 px-2">SORT BY</span>
+              {sortOptions.map((option) => (
+                <button
+                  key={option.key}
+                  onClick={() => handleSort(option.key)}
+                  className={`text-left px-2 py-1.5 text-sm rounded hover:bg-white/5 transition-colors flex justify-between items-center ${sortConfig.key === option.key ? 'text-blue-400' : 'text-gray-300'
+                    }`}
+                >
+                  {option.label}
+                  {sortConfig.key === option.key && (
+                    <span className="text-xs opacity-50">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          }
         />
       </div>
     </div>

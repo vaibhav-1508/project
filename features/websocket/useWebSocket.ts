@@ -19,11 +19,18 @@ export const useWebSocket = () => {
 
       for (let i = 0; i < updateCount; i++) {
         const randomId = tokenIds[Math.floor(Math.random() * tokenIds.length)];
-        const currentPrice = tokens[randomId]?.price;
+        const currentToken = tokens[randomId];
 
-        if (currentPrice !== undefined) {
-          const newPrice = generateRandomPriceUpdate(randomId, currentPrice);
+        if (currentToken) {
+          // Price update
+          const newPrice = generateRandomPriceUpdate(randomId, currentToken.price);
           dispatch(updateTokenPrice({ id: randomId, price: newPrice }));
+
+          // Randomly update volume (10% chance)
+          if (Math.random() > 0.9) {
+            // Logic to update volume would go here if we had an action for it
+            // For now, we just focus on price as that triggers the flash effect
+          }
         }
       }
     }, 2000); // Update every 2 seconds

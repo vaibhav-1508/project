@@ -22,8 +22,11 @@ const LoadingSkeleton = React.memo(() => (
 
 LoadingSkeleton.displayName = 'LoadingSkeleton';
 
+import { selectSortedTokenIds } from '@/features/tokens/store/tokensSlice';
+
 export const Column = React.memo<ColumnProps>(({ title, type }) => {
-  const tokenIds = useAppSelector((state) => state.tokens.lists[type]);
+  const sortedLists = useAppSelector(selectSortedTokenIds);
+  const tokenIds = sortedLists[type];
   const tokens = useAppSelector((state) => state.tokens.tokens);
   const isLoading = useAppSelector((state) => state.ui.isLoading);
 

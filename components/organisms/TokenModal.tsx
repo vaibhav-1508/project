@@ -13,28 +13,18 @@ interface TokenModalProps {
   token: Token | null;
 }
 
-// Gemini API Configuration
-const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || '';
-const GEMINI_MODEL = 'gemini-2.5-flash-preview-09-2025';
-
 const callGemini = async (prompt: string, systemPrompt: string = 'You are a helpful assistant.'): Promise<string> => {
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          systemInstruction: { parts: [{ text: systemPrompt }] },
-        }),
-      }
-    );
+    const response = await fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, systemPrompt }),
+    });
 
-    if (!response.ok) throw new Error('Gemini API call failed');
+    if (!response.ok) throw new Error('API call failed');
 
     const data = await response.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Analysis failed.';
+    return data.text || 'Analysis failed.';
   } catch (error) {
     console.error('Gemini API Error:', error);
     return 'System unavailable.';

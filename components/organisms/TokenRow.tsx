@@ -9,6 +9,7 @@ import { formatCompact, formatTime } from '@/lib/utils/formatters';
 import { TokenImage } from '../molecules/TokenImage';
 import { StatBadge } from '../molecules/StatBadge';
 import { Badge } from '../atoms/Badge';
+import { Tooltip } from '../atoms/Tooltip';
 
 interface TokenRowProps {
   token: Token;
@@ -99,10 +100,18 @@ export const TokenRow = React.memo<TokenRowProps>(({ token }) => {
 
           {/* Row 3: Badges */}
           <div className="flex items-center gap-2 mt-2 flex-wrap">
-            <StatBadge icon={Users} value={token.badges.dev} color="text-rose-500" />
-            <StatBadge icon={ShieldCheck} text="DS" color="text-blue-400" />
-            <StatBadge icon={Ghost} value={token.badges.sniper} color="text-indigo-400" />
-            <StatBadge icon={Lock} value={token.badges.top10} color="text-emerald-500" />
+            <Tooltip content="Developer">
+              <StatBadge icon={Users} value={token.badges.dev} color="text-rose-500" />
+            </Tooltip>
+            <Tooltip content="Audit">
+              <StatBadge icon={ShieldCheck} text="DS" color="text-blue-400" />
+            </Tooltip>
+            <Tooltip content="Sniper">
+              <StatBadge icon={Ghost} value={token.badges.sniper} color="text-indigo-400" />
+            </Tooltip>
+            <Tooltip content="Top 10 Holders">
+              <StatBadge icon={Lock} value={token.badges.top10} color="text-emerald-500" />
+            </Tooltip>
             {token.isPaid && <Badge variant="success">Paid</Badge>}
           </div>
         </div>
